@@ -14,7 +14,6 @@ const serviceSchema = new Schema(
       required: true,
     },
     ratings: Array,
-    overallRating: Number,
     summary: {
       type: String,
       required: true,
@@ -28,7 +27,7 @@ const serviceSchema = new Schema(
       required: true,
     },
     accessible: {
-      type: String,
+      type: Boolean,
       required: true,
     },
   },
