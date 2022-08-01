@@ -12,6 +12,14 @@ router.get("/", (req, res) => {
 });
 
 //GET a specific service using id in url
+router.get("/:serviceId", (req, res) => {
+  console.log("router working");
+  Service.find({ _id: req.params.serviceId })
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((err) => console.log(err));
+});
 
 //DELETE a service
 
@@ -73,5 +81,7 @@ router.post("/services", (req, res) => {
       console.log(err);
     });
 });
+
+//PUT/PATCH update a service
 
 module.exports = router;
