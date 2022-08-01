@@ -2,8 +2,13 @@ const router = require("express").Router();
 const Therapist = require("../models/therapist.js");
 
 //GET all therapists
-router.get("/", (_, res) => {
+router.get("/", (req, res) => {
   console.log("router working");
+  Therapist.find()
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((err) => console.log(err));
 });
 
 //GET a specific therapist using id in url
