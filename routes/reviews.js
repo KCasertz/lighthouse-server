@@ -1,6 +1,7 @@
 const router = require("express").Router();
+const Review = require("../models/service");
 
-//GET all reviews fro a specific service id
+//GET all reviews for a specific service id
 router.get("/", (_, res) => {
   console.log("router working");
 });
@@ -10,7 +11,7 @@ router.get("/", (_, res) => {
 //DELETE a review
 
 //POST - add a new review to a service and update the service rating array
-app.post("/:serviceId/post-review", (req, res) => {
+router.post("/:serviceId/post-review", (req, res) => {
   const review = new Review({
     name: req.body.name,
     review: req.body.review,

@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const Therapist = require("../models/therapist.js");
 
 //GET all therapists
 router.get("/", (_, res) => {

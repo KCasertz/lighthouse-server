@@ -1,8 +1,14 @@
 const router = require("express").Router();
+const Service = require("../models/service.js");
 
 //GET all services
-router.get("/", (_, res) => {
+router.get("/", (req, res) => {
   console.log("router working");
+  Service.find()
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((err) => console.log(err));
 });
 
 //GET a specific service using id in url
