@@ -22,6 +22,17 @@ router.get("/:serviceId", (req, res) => {
 });
 
 //DELETE a service
+router.delete("/:serviceId", (req, res) => {
+  console.log("router working");
+  Service.findByIdAndDelete({ _id: req.params.serviceId })
+    .then((result) => {
+      res.status(200).json({ redirect: "/" });
+      //in front-end, use redirect as follows
+      //.then for 2nd time after getting response, .then ((data) => {window.location.href = data.redirect}) .catch
+    })
+    .catch((err) => console.log(err));
+});
+//delete all reviews assoc with it too
 
 //POST - add a new service to the db
 router.post("/services", (req, res) => {

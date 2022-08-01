@@ -22,6 +22,16 @@ router.get("/:therapistId", (req, res) => {
 });
 
 //DELETE a therapist
+router.delete("/:therapistId", (req, res) => {
+  console.log("router working");
+  Therapist.findByIdAndDelete({ _id: req.params.therapistId })
+    .then((result) => {
+      res.status(200).json({ redirect: "/" });
+      //in front-end, use redirect as follows
+      //.then for 2nd time after getting response, .then ((data) => {window.location.href = data.redirect}) .catch
+    })
+    .catch((err) => console.log(err));
+});
 
 //POST - add a new therapist to the db
 router.post("/", (req, res) => {

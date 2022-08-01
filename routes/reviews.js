@@ -22,6 +22,16 @@ router.get("/:serviceId", (req, res) => {
 });
 
 //DELETE a review
+router.delete("/:reviewId", (req, res) => {
+  console.log("router working");
+  Review.findByIdAndDelete({ _id: req.params.reviewId })
+    .then((result) => {
+      res.status(200).json({ redirect: "/" });
+      //in front-end, use redirect as follows
+      //.then for 2nd time after getting response, .then ((data) => {window.location.href = data.redirect}) .catch
+    })
+    .catch((err) => console.log(err));
+});
 
 //POST - add a new review to a service and update the service rating array
 router.post("/:serviceId/post-review", (req, res) => {
@@ -43,5 +53,7 @@ router.post("/:serviceId/post-review", (req, res) => {
       console.log(err);
     });
 });
+
+//PUT/PATCH an existing review (not sure I will use this)
 
 module.exports = router;
