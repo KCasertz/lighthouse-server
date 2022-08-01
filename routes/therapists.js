@@ -12,6 +12,14 @@ router.get("/", (req, res) => {
 });
 
 //GET a specific therapist using id in url
+router.get("/:therapistId", (req, res) => {
+  console.log("therapist by id router working");
+  Therapist.find({ _id: req.params.therapistId })
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((err) => console.log(err));
+});
 
 //DELETE a therapist
 
