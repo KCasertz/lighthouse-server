@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const serviceSchema = new Schema(
+const therapistSchema = new Schema(
   {
     name: {
       type: String,
@@ -12,13 +12,11 @@ const serviceSchema = new Schema(
     description: {
       type: String,
       required: true,
-      maxLength: 500,
     },
     ratings: Array,
     summary: {
       type: String,
       required: true,
-      maxLength: 500,
     },
     waitingTimeMonths: {
       type: Number,
@@ -35,6 +33,7 @@ const serviceSchema = new Schema(
     email: String,
     phone: String,
     website: String,
+    whatExpect: String,
     location: {
       type: {
         long: String,
@@ -63,38 +62,41 @@ const serviceSchema = new Schema(
       required: true,
     },
     availability: {
-      type: {
-        MonAM: Boolean,
-        MonPM: Boolean,
-        MonEve: Boolean,
-        TueEve: Boolean,
-        TueAM: Boolean,
-        TuePM: Boolean,
-        WedEve: Boolean,
-        WedAM: Boolean,
-        WedPM: Boolean,
-        ThuEve: Boolean,
-        ThuAM: Boolean,
-        ThuPM: Boolean,
-        FriEve: Boolean,
-        FriAM: Boolean,
-        FriPM: Boolean,
-        SatEve: Boolean,
-        SatAM: Boolean,
-        SatPM: Boolean,
-        SunEve: Boolean,
-        SunAM: Boolean,
-        SunPM: Boolean,
-      },
+      type: [
+        {
+          MonAM: Boolean,
+          MonPM: Boolean,
+          MonEve: Boolean,
+          TueEve: Boolean,
+          TueAM: Boolean,
+          TuePM: Boolean,
+          WedEve: Boolean,
+          WedAM: Boolean,
+          WedPM: Boolean,
+          ThuEve: Boolean,
+          ThuAM: Boolean,
+          ThuPM: Boolean,
+          FriEve: Boolean,
+          FriAM: Boolean,
+          FriPM: Boolean,
+          SatEve: Boolean,
+          SatAM: Boolean,
+          SatPM: Boolean,
+          SunEve: Boolean,
+          SunAM: Boolean,
+          SunPM: Boolean,
+        },
+      ],
       required: true,
     },
     bookDirect: Boolean,
     bookingLink: String,
     imageUrl: String,
+    slidingScale: Boolean,
   },
   { timestamps: true }
 );
 
-const Service = mongoose.model("Service", serviceSchema);
+const Therapist = mongoose.model("Therapist", therapistSchema);
 
-module.exports = Service;
+module.exports = Therapist;

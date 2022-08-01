@@ -1,17 +1,17 @@
 const router = require("express").Router();
 
-//GET all services
+//GET all therapists
 router.get("/", (_, res) => {
   console.log("router working");
 });
 
-//GET a specific service using id in url
+//GET a specific therapist using id in url
 
-//DELETE a service
+//DELETE a therapist
 
-//POST - add a new service to the db
-router.post("/services", (req, res) => {
-  const service = new Service({
+//POST - add a new therapist to the db
+router.post("/", (req, res) => {
+  const therapist = new Therapist({
     name: req.body.name,
     summary: req.body.summary,
     description: req.body.description,
@@ -58,7 +58,7 @@ router.post("/services", (req, res) => {
     imageUrl: req.body.imageUrl,
   });
 
-  service
+  therapist
     .save()
     .then((result) => {
       res.send(result);
