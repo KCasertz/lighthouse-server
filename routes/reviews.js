@@ -1,9 +1,14 @@
 const router = require("express").Router();
-const Review = require("../models/service");
+const Review = require("../models/review");
 
 //GET all reviews for a specific service id
-router.get("/", (_, res) => {
-  console.log("router working");
+router.get("/", (req, res) => {
+  console.log("reviews router working");
+  Review.find({ serviceId: "62e82097c67bcfb01173987a" })
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => console.log(err));
 });
 
 //GET a specific review using id in url
