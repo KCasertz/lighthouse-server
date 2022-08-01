@@ -1,4 +1,4 @@
-// require("dotenv").config();
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -8,10 +8,10 @@ app.use(cors());
 app.use(express.json());
 
 //link in the router files
-// const servicesRouter = require("./routes/inventories.js");
+const servicesRouter = require("./routes/services.js");
 
 //set up the routers
-// app.use("/inventories", inventoriesRouter);
+app.use("/services", servicesRouter);
 
 //listen to port
 const PORT = process.env.PORT || 3333;
