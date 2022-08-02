@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const Service = require("../models/service.js");
+const Review = require("../models/review");
+
 
 //GET all services
 router.get("/", (req, res) => {
-  console.log("router working");
+  console.log("all services router working");
   Service.find()
     .then((result) => {
       res.status(200).send(result);
@@ -13,7 +15,7 @@ router.get("/", (req, res) => {
 
 //GET a specific service using id in url
 router.get("/:serviceId", (req, res) => {
-  console.log("router working");
+  console.log(" get by service id router working");
   Service.find({ _id: req.params.serviceId })
     .then((result) => {
       res.status(200).send(result);
@@ -26,13 +28,17 @@ router.delete("/:serviceId", (req, res) => {
   console.log("router working");
   Service.findByIdAndDelete({ _id: req.params.serviceId })
     .then((result) => {
-      res.status(200).json({ redirect: "/" });
+      res.status(200).json({ deletedServiceId: req.params.serviceid });
       //in front-end, use redirect as follows
       //.then for 2nd time after getting response, .then ((data) => {window.location.href = data.redirect}) .catch
     })
     .catch((err) => console.log(err));
+    
+    //delete all reviews assoc with it too
+  Review.deleteMany({serviceId: req.params.serviceId }).then((result) => {
+    res.status(200)
+.json({redirect : "/"})  }
 });
-//delete all reviews assoc with it too
 
 //POST - add a new service to the db
 router.post("/services", (req, res) => {
@@ -92,6 +98,8 @@ router.post("/services", (req, res) => {
       console.log(err);
     });
 });
+
+
 
 //PUT/PATCH update a service
 
