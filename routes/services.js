@@ -17,7 +17,7 @@ router.get("/:serviceId", (req, res) => {
   console.log(" get by service id router working");
   Service.find({ _id: req.params.serviceId })
     .then((result) => {
-      res.status(200).send(result);
+      res.status(200).send(result[0]);
     })
     .catch((err) => console.log(err));
 });
@@ -27,7 +27,7 @@ router.delete("/:serviceId", (req, res) => {
   console.log("delete service router working");
   Service.findByIdAndDelete(req.params.serviceId)
     .then((result) => {
-      res.json({ deletedServiceId: req.params.serviceid });
+      res.status(200).json({ deletedServiceId: req.params.serviceid });
       //in front-end, use redirect as follows
       //.then for 2nd time after getting response, .then ((data) => {window.location.href = data.redirect}) .catch
     })
@@ -35,7 +35,7 @@ router.delete("/:serviceId", (req, res) => {
 
   //delete all reviews assoc with it too
   Review.deleteMany({ serviceId: req.params.serviceId }).then((result) => {
-    res.json({ redirect: "/" });
+    res.status(200).json({ redirect: "/" });
   });
 });
 
@@ -94,7 +94,7 @@ router.post("/", (req, res) => {
   service
     .save()
     .then((result) => {
-      res.send(result);
+      res.status(200).send(result);
     })
     .catch((err) => {
       console.log(err);
