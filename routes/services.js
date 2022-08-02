@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Service = require("../models/service.js");
 const Review = require("../models/review");
+const geolib = require("geolib");
 
 //GET all services
 router.get("/", (req, res) => {
@@ -24,33 +25,102 @@ router.get("/service/:serviceId", (req, res) => {
 
 //GET an array of services which use criteria in body to filter out matches based on delivery method, distance from home (if f2f) and availability match.
 
-//   //find all services that match delivery method/s in req.body and create an array of these
+//create function that maps through an array of objects (availability) and compares the users responses to availability to the same key/value in the service's availability array of objects, and increments a counter
+
+// const hasAvailabilityMatches = (userAvailArr, serviceAvailArr) => {
+// let matchesCounter = 0;
+// userAvailArr.forEach((timeslotObj, i) => {
+
+// if (timeslot === service[i]
+// })
+
+// }
+
+//create function that filters array by distance between user-submitted long and lat, and the service location
+const filterByRadius = (array, long, lat, maxRad) => {
+  console.log("got into filter by radius function");
+  let arrayFilteredByDistance = [];
+
+  arrayFilteredByDistance = array.map((service) => {
+    const maxRadM = maxRad * 1000;
+    if (
+      geolib.isPointWithinRadius(
+        {
+          latitude: lat,
+          longitude: long,
+        },
+        {
+          latitude: service.location.coordinates[1],
+          longitude: service.location.coordinates[0],
+        },
+        maxRadM
+      )
+    ) {
+      return service;
+    }
+    return;
+  });
+
+  return arrayFilteredByDistance;
+};
+
 router.get("/filtered", (req, res) => {
   console.log("got into filter route");
 
-  const filterOneArray = Service.find(
-    { deliveryMethod: req.body.deliveryMethod },
-    (err, service) => {
-      if (service.length === 0) {
-        res.json({
-          message:
-            "Sorry, no services match your criteria. Please try using different criteria.",
-        });
-      } else if (service) {
-        res.json(service);
+  //First create array of services sorting by delivery method submitted by user
+
+  Service.find({ deliveryMethod: req.body.deliveryMethod }, (err, services) => {
+    if (services.length === 0) {
+      res.json({
+        message:
+          "Sorry, no services match your criteria. Please try using different criteria.",
+      });
+    } else if (services) {
+      console.log("services: ", services);
+      if (req.body.deliveryMethod === "ftf") {
+        const filterTwoArray = filterByRadius(
+          services,
+          req.body.location.long,
+          req.body.location.lat,
+          req.body.maxRadius
+        );
+        console.log("filterTwoArray: ", filterTwoArray);
+
+        if (filterTwoArray.length === 0) {
+          res.json({
+            message:
+              "Sorry, no services match your criteria. Please try using different criteria.",
+          });
+        } else {
+          console.log("filterTwoArray has items inside");
+          res.status(200).send(filterTwoArray);
+          // })
+          //
+          //   //logic here for sorting by availability - call function and pass array etc as param
+        }
+      } else if (req.body.deliveryMethod !== "ftf") {
+        res.send(
+          "logic to be created here for non ftf to perform function to filter array by availability"
+        );
+        //     //logic here for sorting by availability - call function and pass array etc as param
       } else if (err) {
         res.send(err);
       }
+      //   res.send(services);
     }
-  );
-
-  //filter the array further, if ftf selected, using long and lat to check distance is within user's desired radius.
-
-  if (req.body.deliveryMethod === "ftf") {
-    console.log("got into second filter by radius");
-    filterOneArray.map((Service) => {});
-  }
+  }); //service.find end brackets
+  // .then(() => {
+  //     res.status(200).send(res.data.services);
+  // })
+  // .catch((err) => console.log(err));
 });
+
+//   console.log("filterTwoArray: ", filterTwoArray);
+//   //then filter arrayTwo by availability. Create availability function that gets array sent to it from this and next condition.
+// } else {
+//   console.log("ftf wasnt selected so you're seeing this if logic works");
+//   // filter first array by availability
+// }
 
 //   //only if user submitted pref for f2f, videoCalls and calls filter by all 3 params
 //   if (req.body.ftf && !!req.body.videoCalls && !!) {
@@ -128,27 +198,27 @@ router.post("/", (req, res) => {
     group: req.body.group,
     individual: req.body.individual,
     availability: [
-      { MonAM: req.body.availability[0].MonAM },
-      { MonPM: req.body.availability[1].MonPM },
-      { MonEve: req.body.availability[2].MonEve },
-      { TueAM: req.body.availability[3].TueAM },
-      { TuePM: req.body.availability[4].TuePM },
-      { TueEve: req.body.availability[5].TueEve },
-      { WedAM: req.body.availability[6].WedAM },
-      { WedPM: req.body.availability[7].WedPM },
-      { WedEve: req.body.availability[8].WedEve },
-      { ThuAM: req.body.availability[9].ThuAM },
-      { ThuPM: req.body.availability[10].ThuPM },
-      { ThuEve: req.body.availability[11].ThuEve },
-      { FriAM: req.body.availability[12].FriAM },
-      { FriPM: req.body.availability[13].FriPM },
-      { FriEve: req.body.availability[14].FriEve },
-      { SatAM: req.body.availability[15].SatAM },
-      { SatPM: req.body.availability[16].SatPM },
-      { SatEve: req.body.availability[17].SatEve },
-      { SunAM: req.body.availability[18].SunAM },
-      { SunPM: req.body.availability[19].SunPM },
-      { SunEve: req.body.availability[20].SunEve },
+      req.body.availability[0],
+      req.body.availability[1],
+      req.body.availability[2],
+      req.body.availability[3],
+      req.body.availability[4],
+      req.body.availability[5],
+      req.body.availability[6],
+      req.body.availability[7],
+      req.body.availability[8],
+      req.body.availability[9],
+      req.body.availability[10],
+      req.body.availability[11],
+      req.body.availability[12],
+      req.body.availability[13],
+      req.body.availability[14],
+      req.body.availability[15],
+      req.body.availability[16],
+      req.body.availability[17],
+      req.body.availability[18],
+      req.body.availability[19],
+      req.body.availability[20],
     ],
     bookDirect: req.body.bookDirect,
     bookingLink: req.body.bookingLink,
