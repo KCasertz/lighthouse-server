@@ -13,13 +13,31 @@ router.get("/", (req, res) => {
 });
 
 //GET a specific service using id in url
-router.get("/:serviceId", (req, res) => {
+router.get("/service/:serviceId", (req, res) => {
   console.log(" get by service id router working");
   Service.find({ _id: req.params.serviceId })
     .then((result) => {
       res.status(200).send(result[0]);
     })
     .catch((err) => console.log(err));
+});
+
+//GET an array of services which use criteria in body to filter out matches based on delivery method, distance from home (if f2f) and availability match.
+
+router.get("/filtered", (req, res) => {
+  console.log("get filtered array of services route working");
+
+  //find all services that match delivery method/s in req.body and create an array of these
+
+  //only if user submitted pref for f2f, filter by this param
+  if (req.body.ftf) {
+    Service.find({ ftf: true }, (err, service) => {
+      if (err) {
+        res.send(err);
+      } else console.log(service);
+      res.json(service);
+    });
+  }
 });
 
 //DELETE a service
