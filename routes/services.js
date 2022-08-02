@@ -29,6 +29,24 @@ router.get("/service/:serviceId", (req, res) => {
 
 //   //find all services that match delivery method/s in req.body and create an array of these
 
+router.get("/filtered", (req, res) => {
+  console.log("got into filter route");
+
+  console.log(req.body.deliveryMethod);
+  Service.find({ deliveryMethod: req.body.deliveryMethod }, (err, service) => {
+    if (service.length === 0) {
+      res.json({
+        message:
+          "Sorry, no services match your criteria. Please try using different criteria.",
+      });
+    } else if (service) {
+      res.json(service);
+    } else if (err) {
+      res.send(err);
+    }
+  });
+});
+
 //   //only if user submitted pref for f2f, videoCalls and calls filter by all 3 params
 //   if (req.body.ftf && !!req.body.videoCalls && !!) {
 //     const filterOneArray =  Service.find(
