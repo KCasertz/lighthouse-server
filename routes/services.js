@@ -24,27 +24,32 @@ router.get("/service/:serviceId", (req, res) => {
 
 //GET an array of services which use criteria in body to filter out matches based on delivery method, distance from home (if f2f) and availability match.
 
-// router.get("/filtered", (req, res) => {
-//   console.log("get filtered array of services route working");
-
 //   //find all services that match delivery method/s in req.body and create an array of these
-
 router.get("/filtered", (req, res) => {
   console.log("got into filter route");
 
-  console.log(req.body.deliveryMethod);
-  Service.find({ deliveryMethod: req.body.deliveryMethod }, (err, service) => {
-    if (service.length === 0) {
-      res.json({
-        message:
-          "Sorry, no services match your criteria. Please try using different criteria.",
-      });
-    } else if (service) {
-      res.json(service);
-    } else if (err) {
-      res.send(err);
+  const filterOneArray = Service.find(
+    { deliveryMethod: req.body.deliveryMethod },
+    (err, service) => {
+      if (service.length === 0) {
+        res.json({
+          message:
+            "Sorry, no services match your criteria. Please try using different criteria.",
+        });
+      } else if (service) {
+        res.json(service);
+      } else if (err) {
+        res.send(err);
+      }
     }
-  });
+  );
+
+  //filter the array further, if ftf selected, using long and lat to check distance is within user's desired radius.
+
+  if (req.body.deliveryMethod === "ftf") {
+    console.log("got into second filter by radius");
+    filterOneArray.map((Service) => {});
+  }
 });
 
 //   //only if user submitted pref for f2f, videoCalls and calls filter by all 3 params
@@ -116,8 +121,8 @@ router.post("/", (req, res) => {
     phone: req.body.phone,
     website: req.body.website,
     location: {
-      long: req.body.long,
-      lat: req.body.lat,
+      type: "Point",
+      coordinates: [req.body.location.long, req.body.location.lat],
     },
     deliveryMethod: req.body.deliveryMethod,
     group: req.body.group,

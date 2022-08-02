@@ -37,10 +37,14 @@ const therapistSchema = new Schema(
     website: String,
     location: {
       type: {
-        long: String,
-        lat: String,
+        type: String,
+        enum: ["Point"],
+        required: true,
       },
-      required: true,
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
     },
     deliveryMethod: {
       type: String,

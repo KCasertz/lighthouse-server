@@ -47,8 +47,8 @@ router.post("/", (req, res) => {
     phone: req.body.phone,
     website: req.body.website,
     location: {
-      long: req.body.long,
-      lat: req.body.lat,
+      type: "Point",
+      coordinates: [req.body.location.long, req.body.location.lat],
     },
     deliveryMethod: req.body.deliveryMethod,
     group: req.body.group,
