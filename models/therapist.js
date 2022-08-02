@@ -42,16 +42,8 @@ const therapistSchema = new Schema(
       },
       required: true,
     },
-    ftf: {
-      type: Boolean,
-      required: true,
-    },
-    calls: {
-      type: Boolean,
-      required: true,
-    },
-    videoCalls: {
-      type: Boolean,
+    deliveryMethod: {
+      type: String,
       required: true,
     },
     group: {

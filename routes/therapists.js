@@ -50,9 +50,7 @@ router.post("/", (req, res) => {
       long: req.body.long,
       lat: req.body.lat,
     },
-    ftf: req.body.ftf,
-    calls: req.body.calls,
-    videoCalls: req.body.videoCalls,
+    deliveryMethod: req.body.deliveryMethod,
     group: req.body.group,
     individual: req.body.individual,
     availability: [

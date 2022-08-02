@@ -24,21 +24,46 @@ router.get("/service/:serviceId", (req, res) => {
 
 //GET an array of services which use criteria in body to filter out matches based on delivery method, distance from home (if f2f) and availability match.
 
-router.get("/filtered", (req, res) => {
-  console.log("get filtered array of services route working");
+// router.get("/filtered", (req, res) => {
+//   console.log("get filtered array of services route working");
 
-  //find all services that match delivery method/s in req.body and create an array of these
+//   //find all services that match delivery method/s in req.body and create an array of these
 
-  //only if user submitted pref for f2f, filter by this param
-  if (req.body.ftf) {
-    Service.find({ ftf: true }, (err, service) => {
-      if (err) {
-        res.send(err);
-      } else console.log(service);
-      res.json(service);
-    });
-  }
-});
+//   //only if user submitted pref for f2f, videoCalls and calls filter by all 3 params
+//   if (req.body.ftf && !!req.body.videoCalls && !!) {
+//     const filterOneArray =  Service.find(
+//         { $or: [{ftf: true}, {videoCalls: true}, {calls: true}] },
+//         (err, service) => {
+//           if (err) {
+//             res.send(err);
+//           } else if (!!service) {
+//             res.json({ message: "no services match your criteria" });
+//           } else {
+//             console.log(service);
+//             res.json(service);
+//           }
+//         }
+//       );
+
+//   if (req.body.ftf && req.body.videoCalls && req.body.calls) {
+//   const filterOneArray =  Service.find(
+//       { $or: [{ftf: true}, {videoCalls: true}, {calls: true}] },
+//       (err, service) => {
+//         if (err) {
+//           res.send(err);
+//         } else if (!!service) {
+//           res.json({ message: "no services match your criteria" });
+//         } else {
+//           console.log(service);
+//           res.json(service);
+//         }
+//       }
+//     );
+//   }
+
+//  }
+
+// });
 
 //DELETE a service
 router.delete("/:serviceId", (req, res) => {
@@ -76,9 +101,7 @@ router.post("/", (req, res) => {
       long: req.body.long,
       lat: req.body.lat,
     },
-    ftf: req.body.ftf,
-    calls: req.body.calls,
-    videoCalls: req.body.videoCalls,
+    deliveryMethod: req.body.deliveryMethod,
     group: req.body.group,
     individual: req.body.individual,
     availability: [
