@@ -142,57 +142,9 @@ router.get("/filtered", (req, res) => {
       } else if (err) {
         res.send(err);
       }
-      //   res.send(services);
     }
-  }); //service.find end brackets
-  // .then(() => {
-  //     res.status(200).send(res.data.services);
-  // })
-  // .catch((err) => console.log(err));
+  }).catch((err) => console.log(err));
 });
-
-//   console.log("filterTwoArray: ", filterTwoArray);
-//   //then filter arrayTwo by availability. Create availability function that gets array sent to it from this and next condition.
-// } else {
-//   console.log("ftf wasnt selected so you're seeing this if logic works");
-//   // filter first array by availability
-// }
-
-//   //only if user submitted pref for f2f, videoCalls and calls filter by all 3 params
-//   if (req.body.ftf && !!req.body.videoCalls && !!) {
-//     const filterOneArray =  Service.find(
-//         { $or: [{ftf: true}, {videoCalls: true}, {calls: true}] },
-//         (err, service) => {
-//           if (err) {
-//             res.send(err);
-//           } else if (!!service) {
-//             res.json({ message: "no services match your criteria" });
-//           } else {
-//             console.log(service);
-//             res.json(service);
-//           }
-//         }
-//       );
-
-//   if (req.body.ftf && req.body.videoCalls && req.body.calls) {
-//   const filterOneArray =  Service.find(
-//       { $or: [{ftf: true}, {videoCalls: true}, {calls: true}] },
-//       (err, service) => {
-//         if (err) {
-//           res.send(err);
-//         } else if (!!service) {
-//           res.json({ message: "no services match your criteria" });
-//         } else {
-//           console.log(service);
-//           res.json(service);
-//         }
-//       }
-//     );
-//   }
-
-//  }
-
-// });
 
 //DELETE a service
 router.delete("/:serviceId", (req, res) => {
@@ -272,5 +224,65 @@ router.post("/", (req, res) => {
 });
 
 //PUT/PATCH update a service
+router.put("/update/:serviceId", (req, res) => {
+  console.log("update existing service route working");
+  console.log(req.body);
+
+  Service.findOneAndUpdate(
+    { _id: req.params.serviceId },
+    {
+      name: req.body.name,
+      summary: req.body.summary,
+      description: req.body.description,
+      ratings: req.body.ratings,
+      waitingTimeMonths: req.body.waitingTimeMonths,
+      lgbtq: req.body.lgbtq,
+      accessible: req.body.accessible,
+      email: req.body.email,
+      phone: req.body.phone,
+      website: req.body.website,
+      location: {
+        type: "Point",
+        coordinates: [req.body.location.long, req.body.location.lat],
+      },
+      deliveryMethod: req.body.deliveryMethod,
+      group: req.body.group,
+      individual: req.body.individual,
+      availability: [
+        req.body.availability[0],
+        req.body.availability[1],
+        req.body.availability[2],
+        req.body.availability[3],
+        req.body.availability[4],
+        req.body.availability[5],
+        req.body.availability[6],
+        req.body.availability[7],
+        req.body.availability[8],
+        req.body.availability[9],
+        req.body.availability[10],
+        req.body.availability[11],
+        req.body.availability[12],
+        req.body.availability[13],
+        req.body.availability[14],
+        req.body.availability[15],
+        req.body.availability[16],
+        req.body.availability[17],
+        req.body.availability[18],
+        req.body.availability[19],
+        req.body.availability[20],
+      ],
+      bookDirect: req.body.bookDirect,
+      bookingLink: req.body.bookingLink,
+      imageUrl: req.body.imageUrl,
+    },
+    { new: true }
+  )
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
 
 module.exports = router;
