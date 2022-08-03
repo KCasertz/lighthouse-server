@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Review = require("../models/review");
+const Service = require("../models/service.js");
 
 //GET a specific review using id in url (useful to delete it later)
 router.get("/:reviewId", (req, res) => {
@@ -43,6 +44,18 @@ router.post("/:serviceId/post-review", (req, res) => {
     dateReferred: req.body.dateReferred,
     dateAccessed: req.body.dateAccessed,
   });
+
+  Service.findOneAndUpdate(
+    { _id: req.body.serviceId },
+    { $push: { ratings: req.body.rating } },
+    (err, res) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(res);
+      }
+    }
+  );
 
   review
     .save()
