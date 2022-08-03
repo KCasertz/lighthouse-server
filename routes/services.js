@@ -125,14 +125,16 @@ router.get("/filtered", (req, res) => {
       } else if (req.body.deliveryMethod !== "ftf") {
         console.log("not ftf so skipping straight to filter by availability");
 
-        const filterFourArray = services.map((service) => {
+        const filterFourArray = [];
+
+        services.map((service) => {
           if (
             checkHowManySlotsmMatch(
               req.body.availability,
               service.availability
             ) > 0
           ) {
-            return service;
+            filterFourArray.push(service);
           } else {
             return;
           }
