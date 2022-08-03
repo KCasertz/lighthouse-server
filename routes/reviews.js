@@ -3,7 +3,7 @@ const Review = require("../models/review");
 const Service = require("../models/service.js");
 
 //GET a specific review using id in url (useful to delete it later)
-router.get("/:reviewId", (req, res) => {
+router.get("/review-id/:reviewId", (req, res) => {
   console.log("reviewID router working");
   Review.find({ _id: req.params.reviewId })
     .then((result) => {
@@ -13,7 +13,7 @@ router.get("/:reviewId", (req, res) => {
 });
 
 //GET all reviews for a specific service id
-router.get("/:serviceId", (req, res) => {
+router.get("/service-id/:serviceId", (req, res) => {
   console.log("reviews router working");
   Review.find({ serviceId: req.params.serviceId })
     .then((result) => {
@@ -23,8 +23,27 @@ router.get("/:serviceId", (req, res) => {
 });
 
 //DELETE a review
-router.delete("/:reviewId", (req, res) => {
+router.delete("/:reviewId/delete", (req, res) => {
   console.log("router working");
+
+  Review.findById({ _id: req.params.reviewId })
+    .then((result) => {
+      const { rating, serviceId } = result;
+
+      Service.findOneAndUpdate(
+        { _id: serviceId },
+        { $pull: { ratings: rating } },
+        (err, res) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(res);
+          }
+        }
+      );
+    })
+    .catch((err) => console.log(err));
+
   Review.findByIdAndDelete({ _id: req.params.reviewId })
     .then((result) => {
       res.status(200).json({ redirect: "/" });
@@ -66,7 +85,5 @@ router.post("/:serviceId/post-review", (req, res) => {
       console.log(err);
     });
 });
-
-//PUT/PATCH an existing review (not sure I will use this)
 
 module.exports = router;
