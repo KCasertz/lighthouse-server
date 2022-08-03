@@ -25,23 +25,35 @@ router.get("/service/:serviceId", (req, res) => {
 
 //GET an array of services which use criteria in body to filter out matches based on delivery method, distance from home (if f2f) and availability match.
 
-//create function that maps through an array of objects (availability) and compares the users responses to availability to the same key/value in the service's availability array of objects, and increments a counter
+//create function that maps through an array of booleans for availability within timeslots (in specific order am, pm, eve for mon-sun) and compares the users responses to availability to the same index position in the service's availability array of objects, and increments a counter to signify whether a user's availability matches the services. If at least one match, it returns true. If user has said they are not available aka a false in their array, it does not increment the counter despite it being a match.
 
-// const hasAvailabilityMatches = (userAvailArr, serviceAvailArr) => {
-// let matchesCounter = 0;
-// userAvailArr.forEach((timeslotObj, i) => {
+const checkHowManySlotsmMatch = (userAvailArr, serviceAvailArr) => {
+  let matchesCounter = 0;
+  userAvailArr.forEach((timeslot, i) => {
+    console.log("timeslot: ", timeslot);
+    console.log("serviceAvailArr[i]:", serviceAvailArr[i]);
+    if (timeslot === false) {
+      console.log("timeslot was false");
+    } else if (timeslot === serviceAvailArr[i]) {
+      matchesCounter = matchesCounter + 1;
+    }
+  });
 
-// if (timeslot === service[i]
-// })
+  return matchesCounter;
+};
 
-// }
+//testing the function above
+// const testArray = [false, false, true, false, false, true];
+// const testArrayTwo = [false, false, true, false, false, true];
+
+// console.log("functiontest:", checkHowManySlotsmMatch(testArrayTwo, testArray));
 
 //create function that filters array by distance between user-submitted long and lat, and the service location
 const filterByRadius = (array, long, lat, maxRad) => {
   console.log("got into filter by radius function");
   let arrayFilteredByDistance = [];
 
-  arrayFilteredByDistance = array.map((service) => {
+  array.map((service) => {
     const maxRadM = maxRad * 1000;
     if (
       geolib.isPointWithinRadius(
@@ -56,9 +68,10 @@ const filterByRadius = (array, long, lat, maxRad) => {
         maxRadM
       )
     ) {
-      return service;
+      arrayFilteredByDistance.push(service);
+      return;
     }
-    return;
+    return "didn't match";
   });
 
   return arrayFilteredByDistance;
@@ -93,16 +106,39 @@ router.get("/filtered", (req, res) => {
           });
         } else {
           console.log("filterTwoArray has items inside");
-          res.status(200).send(filterTwoArray);
-          // })
-          //
-          //   //logic here for sorting by availability - call function and pass array etc as param
+          const filterThreeArray = [];
+          filterTwoArray.map((service) => {
+            if (
+              checkHowManySlotsmMatch(
+                req.body.availability,
+                service.availability
+              ) > 0
+            ) {
+              filterThreeArray.push(service);
+            } else {
+              return;
+            }
+          });
+          console.log("filterThreeArray: ", filterThreeArray);
+          res.status(200).send(filterThreeArray);
         }
       } else if (req.body.deliveryMethod !== "ftf") {
-        res.send(
-          "logic to be created here for non ftf to perform function to filter array by availability"
-        );
-        //     //logic here for sorting by availability - call function and pass array etc as param
+        console.log("not ftf so skipping straight to filter by availability");
+
+        const filterFourArray = services.map((service) => {
+          if (
+            checkHowManySlotsmMatch(
+              req.body.availability,
+              service.availability
+            ) > 0
+          ) {
+            return service;
+          } else {
+            return;
+          }
+        });
+        console.log("filterFourArray: ", filterFourArray);
+        res.status(200).send(filterFourArray);
       } else if (err) {
         res.send(err);
       }
