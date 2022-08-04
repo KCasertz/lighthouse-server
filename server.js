@@ -4,9 +4,6 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3333;
-const Service = require("./models/service.js");
-const Therapist = require("./models/therapist.js");
-const Review = require("./models/review.js");
 
 //connect to MongoDB
 const dbURI = `mongodb+srv://katiecaserta:Lighthouse333@lighthouse1.h4zhazg.mongodb.net/LighthouseDB?retryWrites=true&w=majority`;

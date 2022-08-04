@@ -73,29 +73,31 @@ const filterByRadius = (array, long, lat, maxRad) => {
     }
     return "didn't match";
   });
-
+  console.log("arrayfilteredbydistance -->", arrayFilteredByDistance);
   return arrayFilteredByDistance;
 };
 
 router.get("/filtered", (req, res) => {
   console.log("got into filter route");
+  console.log(req.body);
 
   //First create array of services sorting by delivery method submitted by user
 
   Service.find({ deliveryMethod: req.body.deliveryMethod }, (err, services) => {
+    console.log("services if filter by delivery method success -->", services);
     if (services.length === 0) {
       res.json({
         message:
           "Sorry, no services match your criteria. Please try using different criteria.",
       });
     } else if (services) {
-      console.log("services: ", services);
+      console.log("services if successfull deliv methof filter: ", services);
       if (req.body.deliveryMethod === "ftf") {
         const filterTwoArray = filterByRadius(
           services,
           req.body.location.long,
           req.body.location.lat,
-          req.body.maxRadius
+          req.body.maxRad
         );
         console.log("filterTwoArray: ", filterTwoArray);
 
