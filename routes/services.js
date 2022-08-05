@@ -30,8 +30,6 @@ router.get("/service/:serviceId", (req, res) => {
 const checkHowManySlotsmMatch = (userAvailArr, serviceAvailArr) => {
   let matchesCounter = 0;
   userAvailArr.forEach((timeslot, i) => {
-    console.log("timeslot: ", timeslot);
-    console.log("serviceAvailArr[i]:", serviceAvailArr[i]);
     if (timeslot === false) {
       console.log("timeslot was false");
     } else if (timeslot === serviceAvailArr[i]) {
@@ -77,77 +75,58 @@ const filterByRadius = (array, long, lat, maxRad) => {
   return arrayFilteredByDistance;
 };
 
-router.get("/filtered", (req, res) => {
+function isWithinRadius(
+  longitude,
+  latitude,
+  serviceLongitude,
+  serviceLatitude,
+  radius
+) {
+  const kmRadius = radius * 1000;
+  return geolib.isPointWithinRadius(
+    { longitude, latitude },
+    { longitude: serviceLongitude, latitude: serviceLatitude },
+    kmRadius
+  );
+}
+
+router.post("/filtered", async (req, res) => {
   console.log("got into filter route");
   console.log(req.body);
-
   //First create array of services sorting by delivery method submitted by user
 
-  Service.find({ deliveryMethod: req.body.deliveryMethod }, (err, services) => {
-    console.log("services if filter by delivery method success -->", services);
-    if (services.length === 0) {
-      res.json({
-        message:
-          "Sorry, no services match your criteria. Please try using different criteria.",
-      });
-    } else if (services) {
-      console.log("services if successfull deliv methof filter: ", services);
-      if (req.body.deliveryMethod === "ftf") {
-        const filterTwoArray = filterByRadius(
-          services,
-          req.body.location.long,
-          req.body.location.lat,
-          req.body.maxRad
-        );
-        console.log("filterTwoArray: ", filterTwoArray);
+  try {
+    const { deliveryMethod, availability, maxRad } = req.body;
 
-        if (filterTwoArray.length === 0) {
-          res.json({
-            message:
-              "Sorry, no services match your criteria. Please try using different criteria.",
-          });
-        } else {
-          console.log("filterTwoArray has items inside");
-          const filterThreeArray = [];
-          filterTwoArray.map((service) => {
-            if (
-              checkHowManySlotsmMatch(
-                req.body.availability,
-                service.availability
-              ) > 0
-            ) {
-              filterThreeArray.push(service);
-            } else {
-              return;
-            }
-          });
-          console.log("filterThreeArray: ", filterThreeArray);
-          res.status(200).send(filterThreeArray);
-        }
-      } else if (req.body.deliveryMethod !== "ftf") {
-        console.log("not ftf so skipping straight to filter by availability");
+    const services = await Service.find({
+      deliveryMethod: req.body.deliveryMethod,
+    });
+    const results = services.filter((service) => {
+      const isAvailable =
+        checkHowManySlotsmMatch(availability, service.availability) > 0;
 
-        const filterFourArray = [];
-
-        services.map((service) => {
-          if (
-            checkHowManySlotsmMatch(
-              req.body.availability,
-              service.availability
-            ) > 0
-          ) {
-            filterFourArray.push(service);
-          } else {
-            return;
-          }
-        });
-        console.log("filterFourArray: ", filterFourArray);
-        res.status(200).send(filterFourArray);
-      } else if (err) {
-        res.send(err);
+      if (!isAvailable) {
+        return false;
       }
-    }
-  }).catch((err) => console.log(err));
+
+      if (deliveryMethod !== "ftf") {
+        return true;
+      }
+
+      return isWithinRadius(
+        req.body.location.long,
+        req.body.location.lat,
+        service.location.coordinates[0],
+        service.location.coordinates[1],
+        maxRad
+      );
+    });
+
+    res.status(200).send({ results, error: false });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ error: true });
+  }
 });
 
 //DELETE a service
