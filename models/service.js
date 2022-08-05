@@ -20,10 +20,7 @@ const serviceSchema = new Schema(
       required: true,
       maxLength: 500,
     },
-    waitingTimeMonths: {
-      type: Number,
-      required: true,
-    },
+    waitingTime: [Number],
     lgbtq: {
       type: Boolean,
       required: true,

@@ -16,6 +16,7 @@ const reviewSchema = new Schema(
     serviceId: String,
     dateReferred: Date,
     dateAccessed: Date,
+    waitingTimeMonths: String,
   },
   { timestamps: true }
 );

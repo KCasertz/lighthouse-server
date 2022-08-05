@@ -2,6 +2,7 @@ const router = require("express").Router();
 const Service = require("../models/service.js");
 const Review = require("../models/review");
 const geolib = require("geolib");
+const helpers = require("../helpers/helpers.js");
 
 //GET all services
 router.get("/", (req, res) => {
@@ -14,7 +15,7 @@ router.get("/", (req, res) => {
 });
 
 //GET a specific service using id in url
-router.get("/service/:serviceId", (req, res) => {
+router.get("/services/:serviceId", (req, res) => {
   console.log(" get by service id router working");
   Service.find({ _id: req.params.serviceId })
     .then((result) => {
@@ -40,63 +41,42 @@ const checkHowManySlotsmMatch = (userAvailArr, serviceAvailArr) => {
   return matchesCounter;
 };
 
-//testing the function above
-// const testArray = [false, false, true, false, false, true];
-// const testArrayTwo = [false, false, true, false, false, true];
-
-// console.log("functiontest:", checkHowManySlotsmMatch(testArrayTwo, testArray));
-
-//create function that filters array by distance between user-submitted long and lat, and the service location
-const filterByRadius = (array, long, lat, maxRad) => {
-  console.log("got into filter by radius function");
-  let arrayFilteredByDistance = [];
-
-  array.map((service) => {
-    const maxRadM = maxRad * 1000;
-    if (
-      geolib.isPointWithinRadius(
-        {
-          latitude: lat,
-          longitude: long,
-        },
-        {
-          latitude: service.location.coordinates[1],
-          longitude: service.location.coordinates[0],
-        },
-        maxRadM
-      )
-    ) {
-      arrayFilteredByDistance.push(service);
-      return;
-    }
-    return "didn't match";
-  });
-  console.log("arrayfilteredbydistance -->", arrayFilteredByDistance);
-  return arrayFilteredByDistance;
-};
-
-function isWithinRadius(
+const isWithinRadius = (
   longitude,
   latitude,
   serviceLongitude,
   serviceLatitude,
   radius
-) {
+) => {
   const kmRadius = radius * 1000;
   return geolib.isPointWithinRadius(
     { longitude, latitude },
     { longitude: serviceLongitude, latitude: serviceLatitude },
     kmRadius
   );
-}
+};
 
 router.post("/filtered", async (req, res) => {
   console.log("got into filter route");
   console.log(req.body);
   //First create array of services sorting by delivery method submitted by user
 
+  //validation inc regEx for postcode
+  if (
+    !req.body.deliveryMethod ||
+    !req.body.availability
+    // req.body.availability.length !== 21 ||
+    // !helpers.isValidPostcode(req.body.contact.postcode) ||
+    //   !req.body.postcode
+  ) {
+    return res.status(400).json({
+      errorMessage:
+        "Please ensure you have provided a delivery method and availability array of all 21 timeslots and in the correct formats.",
+    });
+  }
+
   try {
-    const { deliveryMethod, availability, maxRad } = req.body;
+    const { deliveryMethod, availability } = req.body;
 
     const services = await Service.find({
       deliveryMethod: req.body.deliveryMethod,
@@ -118,10 +98,10 @@ router.post("/filtered", async (req, res) => {
         req.body.location.lat,
         service.location.coordinates[0],
         service.location.coordinates[1],
-        maxRad
+        req.body.maxRad
       );
     });
-
+    console.log("results sent to frontend: ", results);
     res.status(200).send({ results, error: false });
   } catch (err) {
     console.log(err);
