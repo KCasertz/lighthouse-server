@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Therapist = require("../models/therapist.js");
+const geolib = require("geolib");
 
 //GET a specific therapist using id in url
 router.get("/:therapistId", (req, res) => {
