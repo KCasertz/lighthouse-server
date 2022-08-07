@@ -4,22 +4,22 @@ const Review = require("../models/review");
 const geolib = require("geolib");
 const helpers = require("../helpers/helpers.js");
 
+//GET a specific service using id in url
+router.get("/:serviceId", (req, res) => {
+  console.log(" get by service id router working");
+  Service.find({ _id: req.params.serviceId })
+    .then((result) => {
+      res.status(200).send(result[0]);
+    })
+    .catch((err) => console.log(err));
+});
+
 //GET all services
 router.get("/", (req, res) => {
   console.log("all services router working");
   Service.find()
     .then((result) => {
       res.status(200).send(result);
-    })
-    .catch((err) => console.log(err));
-});
-
-//GET a specific service using id in url
-router.get("/services/:serviceId", (req, res) => {
-  console.log(" get by service id router working");
-  Service.find({ _id: req.params.serviceId })
-    .then((result) => {
-      res.status(200).send(result[0]);
     })
     .catch((err) => console.log(err));
 });
@@ -122,7 +122,7 @@ router.delete("/:serviceId", (req, res) => {
 
   //delete all reviews assoc with it too
   Review.deleteMany({ serviceId: req.params.serviceId }).then((result) => {
-    res.status(200).json({ redirect: "/" });
+    res.status(200).json({ serviceIdForDeletedReviews: req.params.serviceId });
   });
 });
 
@@ -186,7 +186,7 @@ router.post("/", (req, res) => {
     });
 });
 
-//PUT/PATCH update a service
+//PUT/PATCH update a service - on frontend, form would pull in existing values and then create new object with all fields including updated ones.
 router.put("/update/:serviceId", (req, res) => {
   console.log("update existing service route working");
   console.log(req.body);
