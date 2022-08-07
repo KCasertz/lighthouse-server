@@ -16,7 +16,9 @@ const reviewSchema = new Schema(
     serviceId: String,
     dateReferred: Date,
     dateAccessed: Date,
-    waitingTimeMonths: String,
+    waitingTime: Number,
+    research: Boolean,
+    email: String,
   },
   { timestamps: true }
 );

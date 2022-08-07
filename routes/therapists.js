@@ -40,7 +40,7 @@ router.post("/", (req, res) => {
     summary: req.body.summary,
     description: req.body.description,
     ratings: req.body.ratings,
-    waitingTimeMonths: req.body.waitingTimeMonths,
+    waitingTime: req.body.waitingTime,
     lgbtq: req.body.lgbtq,
     accessible: req.body.accessible,
     email: req.body.email,
@@ -91,6 +91,92 @@ router.post("/", (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+});
+
+// find a therapist fiiltering by user criteria
+
+//function to check availability slots match above 0
+const checkHowManySlotsmMatch = (userAvailArr, serviceAvailArr) => {
+  let matchesCounter = 0;
+  userAvailArr.forEach((timeslot, i) => {
+    if (timeslot === false) {
+      console.log("timeslot was false");
+    } else if (timeslot === serviceAvailArr[i]) {
+      matchesCounter = matchesCounter + 1;
+    }
+  });
+
+  return matchesCounter;
+};
+
+//function to check within user defined radius
+const isWithinRadius = (
+  longitude,
+  latitude,
+  serviceLongitude,
+  serviceLatitude,
+  radius
+) => {
+  const kmRadius = radius * 1000;
+  return geolib.isPointWithinRadius(
+    { longitude, latitude },
+    { longitude: serviceLongitude, latitude: serviceLatitude },
+    kmRadius
+  );
+};
+
+//post because query object too complex to send as URL in get request
+router.post("/filtered", async (req, res) => {
+  console.log("got into filter route");
+  console.log(req.body);
+  //First create array of services sorting by delivery method submitted by user
+
+  //validation inc regEx for postcode
+  if (
+    !req.body.deliveryMethod ||
+    !req.body.availability
+    // req.body.availability.length !== 21 ||
+    // !helpers.isValidPostcode(req.body.contact.postcode) ||
+    //   !req.body.postcode
+  ) {
+    return res.status(400).json({
+      errorMessage:
+        "Please ensure you have provided a delivery method and availability array of all 21 timeslots and in the correct formats.",
+    });
+  }
+
+  try {
+    const { deliveryMethod, availability } = req.body;
+
+    const therapists = await Therapist.find({
+      deliveryMethod: req.body.deliveryMethod,
+    });
+    const results = therapists.filter((therapist) => {
+      const isAvailable =
+        checkHowManySlotsmMatch(availability, therapist.availability) > 0;
+
+      if (!isAvailable) {
+        return false;
+      }
+
+      if (deliveryMethod !== "ftf") {
+        return true;
+      }
+
+      return isWithinRadius(
+        req.body.location.long,
+        req.body.location.lat,
+        therapist.location.coordinates[0],
+        therapist.location.coordinates[1],
+        req.body.maxRad
+      );
+    });
+    console.log("results sent to frontend: ", results);
+    res.status(200).send({ results, error: false });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ error: true });
+  }
 });
 
 module.exports = router;

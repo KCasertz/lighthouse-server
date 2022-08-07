@@ -62,8 +62,11 @@ const therapistSchema = new Schema(
     bookDirect: Boolean,
     bookingLink: String,
     imageUrl: String,
-    slidingScale: Boolean,
-    pricePerHour: Number,
+    slidingScale: { type: Boolean, required: true },
+    pricePerHour: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

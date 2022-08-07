@@ -28,11 +28,11 @@ router.delete("/:reviewId/delete", (req, res) => {
 
   Review.findById({ _id: req.params.reviewId })
     .then((result) => {
-      const { rating, serviceId } = result;
+      const { rating, serviceId, waitingTime } = result;
 
       Service.findOneAndUpdate(
         { _id: serviceId },
-        { $pull: { ratings: rating } },
+        { $pull: { ratings: rating, waitingTime: waitingTime } },
         (err, res) => {
           if (err) {
             console.log(err);
@@ -62,11 +62,14 @@ router.post("/:serviceId/post-review", (req, res) => {
     serviceId: req.params.serviceId,
     dateReferred: req.body.dateReferred,
     dateAccessed: req.body.dateAccessed,
+    waitingTime: req.body.waitingTime,
+    research: req.body.research,
+    email: req.body.email,
   });
 
   Service.findOneAndUpdate(
     { _id: req.body.serviceId },
-    { $push: { ratings: req.body.rating } },
+    { $push: { ratings: req.body.rating, waitingTime: req.body.waitingTime } },
     (err, res) => {
       if (err) {
         console.log(err);
