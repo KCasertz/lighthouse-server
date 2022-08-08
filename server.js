@@ -5,7 +5,7 @@ const app = express();
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3333;
 
-//connect to MongoDB
+//connect to MongoDB and set up server
 const dbURI = `mongodb+srv://katiecaserta:Lighthouse333@lighthouse1.h4zhazg.mongodb.net/LighthouseDB?retryWrites=true&w=majority`;
 mongoose
   .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
