@@ -1,4 +1,4 @@
-# Project Title
+# Lighthouse
 
 A mobile-first web-app to help you navigate the mental health system
 
