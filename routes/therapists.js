@@ -4,7 +4,6 @@ const geolib = require("geolib");
 
 //GET a specific therapist using id in url
 router.get("/:therapistId", (req, res) => {
-  console.log("therapist by id router working");
   Therapist.find({ _id: req.params.therapistId })
     .then((result) => {
       res.status(200).send(result);
@@ -14,7 +13,6 @@ router.get("/:therapistId", (req, res) => {
 
 //GET all therapists
 router.get("/", (req, res) => {
-  console.log("router working");
   Therapist.find()
     .then((result) => {
       res.status(200).send(result);
@@ -24,7 +22,6 @@ router.get("/", (req, res) => {
 
 //DELETE a therapist
 router.delete("/:therapistId", (req, res) => {
-  console.log("router working");
   Therapist.findByIdAndDelete({ _id: req.params.therapistId })
     .then((result) => {
       res.status(200).json({ deletedTherapistId: req.params.therapistId });
@@ -92,14 +89,10 @@ router.post("/", (req, res) => {
     });
 });
 
-// find a therapist fiiltering by user criteria
-
-//function to check availability slots match above 0
 const checkHowManySlotsmMatch = (userAvailArr, serviceAvailArr) => {
   let matchesCounter = 0;
   userAvailArr.forEach((timeslot, i) => {
     if (timeslot === false) {
-      console.log("timeslot was false");
     } else if (timeslot === serviceAvailArr[i]) {
       matchesCounter = matchesCounter + 1;
     }
@@ -126,18 +119,7 @@ const isWithinRadius = (
 
 //post because query object too complex to send as URL in get request
 router.post("/filtered", async (req, res) => {
-  console.log("got into filter route");
-  console.log(req.body);
-  //First create array of services sorting by delivery method submitted by user
-
-  //validation inc regEx for postcode
-  if (
-    !req.body.deliveryMethod ||
-    !req.body.availability
-    // req.body.availability.length !== 21 ||
-    // !helpers.isValidPostcode(req.body.contact.postcode) ||
-    //   !req.body.postcode
-  ) {
+  if (!req.body.deliveryMethod || !req.body.availability) {
     return res.status(400).json({
       errorMessage:
         "Please ensure you have provided a delivery method and availability array of all 21 timeslots and in the correct formats.",
@@ -170,7 +152,6 @@ router.post("/filtered", async (req, res) => {
         req.body.maxRad
       );
     });
-    console.log("results sent to frontend: ", results);
     res.status(200).send({ results, error: false });
   } catch (err) {
     console.log(err);
@@ -180,9 +161,6 @@ router.post("/filtered", async (req, res) => {
 
 //PUT update a therapist
 router.put("/update/:therapistId", (req, res) => {
-  console.log("update existing therapist route working");
-  console.log(req.body);
-
   Therapist.findOneAndUpdate(
     { _id: req.params.therapistId },
     {
